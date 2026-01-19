@@ -2,18 +2,11 @@ package com.booker.api.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Objects;
 
 /**
  * Address Model (nested in User)
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Address {
@@ -22,4 +15,127 @@ public class Address {
     private String city;
     private String zipcode;
     private Geo geo;
+
+    public Address() {
+    }
+
+    public Address(String street, String suite, String city, String zipcode, Geo geo) {
+        this.street = street;
+        this.suite = suite;
+        this.city = city;
+        this.zipcode = zipcode;
+        this.geo = geo;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getSuite() {
+        return suite;
+    }
+
+    public void setSuite(String suite) {
+        this.suite = suite;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getZipcode() {
+        return zipcode;
+    }
+
+    public void setZipcode(String zipcode) {
+        this.zipcode = zipcode;
+    }
+
+    public Geo getGeo() {
+        return geo;
+    }
+
+    public void setGeo(Geo geo) {
+        this.geo = geo;
+    }
+
+    public static AddressBuilder builder() {
+        return new AddressBuilder();
+    }
+
+    public static class AddressBuilder {
+        private String street;
+        private String suite;
+        private String city;
+        private String zipcode;
+        private Geo geo;
+
+        AddressBuilder() {
+        }
+
+        public AddressBuilder street(String street) {
+            this.street = street;
+            return this;
+        }
+
+        public AddressBuilder suite(String suite) {
+            this.suite = suite;
+            return this;
+        }
+
+        public AddressBuilder city(String city) {
+            this.city = city;
+            return this;
+        }
+
+        public AddressBuilder zipcode(String zipcode) {
+            this.zipcode = zipcode;
+            return this;
+        }
+
+        public AddressBuilder geo(Geo geo) {
+            this.geo = geo;
+            return this;
+        }
+
+        public Address build() {
+            return new Address(street, suite, city, zipcode, geo);
+        }
+
+        public String toString() {
+            return "Address.AddressBuilder(street=" + this.street + ", suite=" + this.suite + ", city=" + this.city
+                    + ", zipcode=" + this.zipcode + ", geo=" + this.geo + ")";
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Address address = (Address) o;
+        return Objects.equals(street, address.street) && Objects.equals(suite, address.suite)
+                && Objects.equals(city, address.city) && Objects.equals(zipcode, address.zipcode)
+                && Objects.equals(geo, address.geo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(street, suite, city, zipcode, geo);
+    }
+
+    @Override
+    public String toString() {
+        return "Address(street=" + this.getStreet() + ", suite=" + this.getSuite() + ", city=" + this.getCity()
+                + ", zipcode=" + this.getZipcode() + ", geo=" + this.getGeo() + ")";
+    }
 }
