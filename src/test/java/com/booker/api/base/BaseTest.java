@@ -1,16 +1,14 @@
 package com.booker.api.base;
 
-import com.booker.api.core.RequestSpecFactory;
-import io.qameta.allure.testng.AllureTestNg;
+import com.booker.api.utils.RequestSpecFactory;
+
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Listeners;
 
 /**
  * Base Test Class
  * Common setup and teardown for all tests
  */
-@Listeners({ AllureTestNg.class })
 public class BaseTest {
 
     @BeforeSuite(alwaysRun = true)

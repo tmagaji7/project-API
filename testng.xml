@@ -2,6 +2,10 @@
 
 <suite name="API Test Suite" verbose="1">
     
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
     <!-- Suite-level parameters -->
     <parameter name="environment" value="qa"/>
     
