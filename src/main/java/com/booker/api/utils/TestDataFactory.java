@@ -13,9 +13,6 @@ import java.util.UUID;
  */
 public class TestDataFactory {
 
-    private static int postIdCounter = 1000;
-    private static int userIdCounter = 100;
-
     private TestDataFactory() {
     }
 

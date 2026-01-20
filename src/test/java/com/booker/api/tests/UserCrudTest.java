@@ -5,6 +5,10 @@ import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import com.booker.api.models.User;
+import com.booker.api.utils.TestDataFactory;
+import com.booker.api.api.UserApi;
+import com.booker.api.base.BaseTest;
 
 import static com.booker.api.assertions.ResponseAssert.assertThat;
 
@@ -17,7 +21,7 @@ import static com.booker.api.assertions.ResponseAssert.assertThat;
 public class UserCrudTest extends BaseTest {
 
     private User testUser;
-    private int createdUserId = 11; // JSONPlaceholder returns 11 for new users
+    private int createdUserId = 11; // JSONPlaceholder always returns 11 for new users
 
     @BeforeClass(alwaysRun = true)
     public void setupTestData() {
@@ -42,12 +46,14 @@ public class UserCrudTest extends BaseTest {
         System.out.println("✓ Created user: " + testUser.getName() + " with ID: " + createdUserId);
     }
 
+    // Depends on creation to ensure API is healthy, but fetches ID 1 because
+    // Creation doesn't persist in JSONPlaceholder
     @Test(priority = 2, groups = { "smoke" }, dependsOnMethods = "testCreateUser")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Get an existing user by ID with all nested data")
     @Story("Get User")
     public void testGetUser() {
-        Response response = UserApi.getUser(1);
+        Response response = UserApi.getUser(1); // Fetching ID 1 as ID 11 doesn't exist on server
 
         assertThat(response)
                 .statusCodeIs(200)
@@ -78,7 +84,8 @@ public class UserCrudTest extends BaseTest {
         System.out.println("✓ Retrieved " + userCount + " users");
     }
 
-    @Test(priority = 4, groups = { "smoke" })
+    // Depends on Get to ensure we can read before we write
+    @Test(priority = 4, groups = { "smoke" }, dependsOnMethods = "testGetUser")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Update an existing user")
     @Story("Update User")
@@ -95,7 +102,8 @@ public class UserCrudTest extends BaseTest {
         System.out.println("✓ Updated user to: " + response.jsonPath().getString("name"));
     }
 
-    @Test(priority = 5, groups = { "smoke" })
+    // Depends on Update to complete the lifecycle
+    @Test(priority = 5, groups = { "smoke" }, dependsOnMethods = "testUpdateUser")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Delete an existing user")
     @Story("Delete User")
