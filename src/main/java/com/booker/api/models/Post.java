@@ -57,49 +57,6 @@ public class Post {
         this.body = body;
     }
 
-    public static PostBuilder builder() {
-        return new PostBuilder();
-    }
-
-    public static class PostBuilder {
-        private Integer id;
-        private Integer userId;
-        private String title;
-        private String body;
-
-        PostBuilder() {
-        }
-
-        public PostBuilder id(Integer id) {
-            this.id = id;
-            return this;
-        }
-
-        public PostBuilder userId(Integer userId) {
-            this.userId = userId;
-            return this;
-        }
-
-        public PostBuilder title(String title) {
-            this.title = title;
-            return this;
-        }
-
-        public PostBuilder body(String body) {
-            this.body = body;
-            return this;
-        }
-
-        public Post build() {
-            return new Post(id, userId, title, body);
-        }
-
-        public String toString() {
-            return "Post.PostBuilder(id=" + this.id + ", userId=" + this.userId + ", title=" + this.title + ", body="
-                    + this.body + ")";
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)

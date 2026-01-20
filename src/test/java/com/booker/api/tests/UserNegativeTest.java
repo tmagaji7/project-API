@@ -2,10 +2,13 @@ package com.booker.api.tests;
 
 import com.booker.api.api.UserApi;
 import com.booker.api.base.BaseTest;
+
 import io.qameta.allure.*;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import static com.booker.api.assertions.ResponseAssert.assertThat;
 
 /**
  * User Negative Tests
@@ -22,7 +25,7 @@ public class UserNegativeTest extends BaseTest {
     public void testGetUserInvalidId() {
         Response response = UserApi.getUser(99999);
 
-        Assert.assertEquals(response.getStatusCode(), 404, "Should return 404");
+        assertThat(response).statusCodeIs(404);
 
         System.out.println("✓ Correctly returned 404 for invalid user ID");
     }

@@ -1,5 +1,6 @@
 package com.booker.api.utils;
 
+import com.booker.api.builders.*;
 import com.booker.api.models.*;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class TestDataFactory {
 
     public static Post createRandomPost() {
         String unique = UUID.randomUUID().toString().substring(0, 6);
-        return Post.builder()
+        return new PostBuilder()
                 .userId(1)
                 .title("Test Post " + unique)
                 .body("This is a test post body with unique ID: " + unique)
@@ -30,7 +31,7 @@ public class TestDataFactory {
     }
 
     public static Post createPost(int userId, String title, String body) {
-        return Post.builder()
+        return new PostBuilder()
                 .userId(userId)
                 .title(title)
                 .body(body)
@@ -50,12 +51,12 @@ public class TestDataFactory {
     public static User createRandomUser() {
         String unique = UUID.randomUUID().toString().substring(0, 6);
 
-        Geo geo = Geo.builder()
+        Geo geo = new GeoBuilder()
                 .lat("40.7128")
                 .lng("-74.0060")
                 .build();
 
-        Address address = Address.builder()
+        Address address = new AddressBuilder()
                 .street("123 Test Street " + unique)
                 .suite("Suite " + unique)
                 .city("Test City")
@@ -63,13 +64,13 @@ public class TestDataFactory {
                 .geo(geo)
                 .build();
 
-        Company company = Company.builder()
+        Company company = new CompanyBuilder()
                 .name("Test Company " + unique)
                 .catchPhrase("Innovation " + unique)
                 .bs("enterprise solutions")
                 .build();
 
-        return User.builder()
+        return new UserBuilder()
                 .name("Test User " + unique)
                 .username("testuser_" + unique)
                 .email("test_" + unique + "@example.com")

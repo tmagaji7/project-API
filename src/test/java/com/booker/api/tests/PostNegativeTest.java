@@ -2,11 +2,15 @@ package com.booker.api.tests;
 
 import com.booker.api.api.PostApi;
 import com.booker.api.base.BaseTest;
+import com.booker.api.builders.PostBuilder;
 import com.booker.api.models.Post;
+
 import io.qameta.allure.*;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import static com.booker.api.assertions.ResponseAssert.assertThat;
 
 /**
  * Post Negative Tests
@@ -23,7 +27,7 @@ public class PostNegativeTest extends BaseTest {
     public void testGetPostInvalidId() {
         Response response = PostApi.getPost(99999);
 
-        Assert.assertEquals(response.getStatusCode(), 404, "Should return 404 for invalid ID");
+        assertThat(response).statusCodeIs(404);
 
         System.out.println("✓ Correctly returned 404 for invalid post ID");
     }
@@ -33,7 +37,7 @@ public class PostNegativeTest extends BaseTest {
     @Description("Create post with empty body")
     @Story("Empty Post Body")
     public void testCreatePostEmptyBody() {
-        Post emptyPost = Post.builder()
+        Post emptyPost = new PostBuilder()
                 .userId(1)
                 .title("")
                 .body("")
@@ -42,7 +46,7 @@ public class PostNegativeTest extends BaseTest {
         Response response = PostApi.createPost(emptyPost);
 
         // JSONPlaceholder accepts empty posts (returns 201)
-        Assert.assertEquals(response.getStatusCode(), 201);
+        assertThat(response).statusCodeIs(201);
 
         System.out.println("✓ Post created with empty fields (API accepts it)");
     }
@@ -52,7 +56,7 @@ public class PostNegativeTest extends BaseTest {
     @Description("Update non-existent post")
     @Story("Update Invalid Post")
     public void testUpdateNonExistentPost() {
-        Post post = Post.builder()
+        Post post = new PostBuilder()
                 .userId(1)
                 .title("Test")
                 .body("Test body")

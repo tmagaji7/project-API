@@ -37,37 +37,6 @@ public class Geo {
         this.lng = lng;
     }
 
-    public static GeoBuilder builder() {
-        return new GeoBuilder();
-    }
-
-    public static class GeoBuilder {
-        private String lat;
-        private String lng;
-
-        GeoBuilder() {
-        }
-
-        public GeoBuilder lat(String lat) {
-            this.lat = lat;
-            return this;
-        }
-
-        public GeoBuilder lng(String lng) {
-            this.lng = lng;
-            return this;
-        }
-
-        public Geo build() {
-            return new Geo(lat, lng);
-        }
-
-        @Override
-        public String toString() {
-            return "Geo.GeoBuilder(lat=" + this.lat + ", lng=" + this.lng + ")";
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)

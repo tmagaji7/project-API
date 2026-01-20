@@ -1,14 +1,12 @@
 package com.booker.api.tests;
 
-import com.booker.api.api.UserApi;
-import com.booker.api.base.BaseTest;
-import com.booker.api.models.User;
-import com.booker.api.utils.TestDataFactory;
 import io.qameta.allure.*;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static com.booker.api.assertions.ResponseAssert.assertThat;
 
 /**
  * User CRUD Tests
@@ -26,65 +24,61 @@ public class UserCrudTest extends BaseTest {
         testUser = TestDataFactory.createRandomUser();
     }
 
-    @Test(priority = 1, groups = { "smoke", "user" })
+    @Test(priority = 1, groups = { "smoke" })
     @Severity(SeverityLevel.CRITICAL)
     @Description("Create a new user with nested Address and Company")
     @Story("Create User")
     public void testCreateUser() {
         Response response = UserApi.createUser(testUser);
 
-        Assert.assertEquals(response.getStatusCode(), 201, "Status should be 201 Created");
-        Assert.assertEquals(response.jsonPath().getInt("id"), createdUserId);
-        Assert.assertEquals(response.jsonPath().getString("name"), testUser.getName());
-        Assert.assertEquals(response.jsonPath().getString("email"), testUser.getEmail());
-
-        // Verify nested objects
-        Assert.assertEquals(response.jsonPath().getString("address.city"), testUser.getAddress().getCity());
-        Assert.assertEquals(response.jsonPath().getString("company.name"), testUser.getCompany().getName());
+        assertThat(response)
+                .statusCodeIs(201)
+                .bodyContains("id", createdUserId)
+                .bodyContains("name", testUser.getName())
+                .bodyContains("email", testUser.getEmail())
+                .bodyContains("address.city", testUser.getAddress().getCity())
+                .bodyContains("company.name", testUser.getCompany().getName());
 
         System.out.println("✓ Created user: " + testUser.getName() + " with ID: " + createdUserId);
     }
 
-    @Test(priority = 2, groups = { "smoke", "user" }, dependsOnMethods = "testCreateUser")
+    @Test(priority = 2, groups = { "smoke" }, dependsOnMethods = "testCreateUser")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Get an existing user by ID with all nested data")
     @Story("Get User")
     public void testGetUser() {
         Response response = UserApi.getUser(1);
 
-        Assert.assertEquals(response.getStatusCode(), 200);
-        Assert.assertEquals(response.jsonPath().getInt("id"), 1);
-        Assert.assertNotNull(response.jsonPath().getString("name"));
-        Assert.assertNotNull(response.jsonPath().getString("email"));
-
-        // Verify nested Address and Geo
-        Assert.assertNotNull(response.jsonPath().getString("address.street"));
-        Assert.assertNotNull(response.jsonPath().getString("address.city"));
-        Assert.assertNotNull(response.jsonPath().getString("address.geo.lat"));
-        Assert.assertNotNull(response.jsonPath().getString("address.geo.lng"));
-
-        // Verify nested Company
-        Assert.assertNotNull(response.jsonPath().getString("company.name"));
+        assertThat(response)
+                .statusCodeIs(200)
+                .bodyContains("id", 1)
+                .hasField("name")
+                .hasField("email")
+                .hasField("address.street")
+                .hasField("address.city")
+                .hasField("address.geo.lat")
+                .hasField("address.geo.lng")
+                .hasField("company.name");
 
         System.out.println("✓ Retrieved user: " + response.jsonPath().getString("name") +
                 " from " + response.jsonPath().getString("address.city"));
     }
 
-    @Test(priority = 3, groups = { "regression", "user" })
+    @Test(priority = 3, groups = { "regression" })
     @Severity(SeverityLevel.NORMAL)
     @Description("Get all users")
     @Story("Get All Users")
     public void testGetAllUsers() {
         Response response = UserApi.getAllUsers();
 
-        Assert.assertEquals(response.getStatusCode(), 200);
+        assertThat(response).statusCodeIs(200);
         int userCount = response.jsonPath().getList("$").size();
         Assert.assertEquals(userCount, 10, "Should return 10 users");
 
         System.out.println("✓ Retrieved " + userCount + " users");
     }
 
-    @Test(priority = 4, groups = { "smoke", "user" })
+    @Test(priority = 4, groups = { "smoke" })
     @Severity(SeverityLevel.CRITICAL)
     @Description("Update an existing user")
     @Story("Update User")
@@ -94,20 +88,21 @@ public class UserCrudTest extends BaseTest {
 
         Response response = UserApi.updateUser(1, updatedUser);
 
-        Assert.assertEquals(response.getStatusCode(), 200);
-        Assert.assertEquals(response.jsonPath().getString("name"), "Updated User Name");
+        assertThat(response)
+                .statusCodeIs(200)
+                .bodyContains("name", "Updated User Name");
 
         System.out.println("✓ Updated user to: " + response.jsonPath().getString("name"));
     }
 
-    @Test(priority = 5, groups = { "smoke", "user" })
+    @Test(priority = 5, groups = { "smoke" })
     @Severity(SeverityLevel.CRITICAL)
     @Description("Delete an existing user")
     @Story("Delete User")
     public void testDeleteUser() {
         Response response = UserApi.deleteUser(1);
 
-        Assert.assertEquals(response.getStatusCode(), 200);
+        assertThat(response).statusCodeIs(200);
 
         System.out.println("✓ Deleted user successfully");
     }

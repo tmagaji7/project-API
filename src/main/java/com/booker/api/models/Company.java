@@ -47,43 +47,6 @@ public class Company {
         this.bs = bs;
     }
 
-    public static CompanyBuilder builder() {
-        return new CompanyBuilder();
-    }
-
-    public static class CompanyBuilder {
-        private String name;
-        private String catchPhrase;
-        private String bs;
-
-        CompanyBuilder() {
-        }
-
-        public CompanyBuilder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public CompanyBuilder catchPhrase(String catchPhrase) {
-            this.catchPhrase = catchPhrase;
-            return this;
-        }
-
-        public CompanyBuilder bs(String bs) {
-            this.bs = bs;
-            return this;
-        }
-
-        public Company build() {
-            return new Company(name, catchPhrase, bs);
-        }
-
-        public String toString() {
-            return "Company.CompanyBuilder(name=" + this.name + ", catchPhrase=" + this.catchPhrase + ", bs=" + this.bs
-                    + ")";
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
