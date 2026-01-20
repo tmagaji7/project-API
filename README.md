@@ -1,126 +1,99 @@
-# API Test Framework
+# Booking API Test Automation Framework
 
-A professional REST API test automation framework using **Java 17**, **REST Assured**, **TestNG**, **Lombok**, and **Allure Reporting**.
+## Overview
+This project is a robust, modular, and scalable test automation framework for the JSONPlaceholder API. It is built using **Java**, **RestAssured**, **TestNG**, and **Allure Report**, adhering to clean code principles and industry best practices.
 
-## 🛠️ Tech Stack
+The framework is designed to handle complex nested objects (like Users with Addresses and Companies) and validates standard CRUD operations.
 
-| Component | Library | Version |
-|-----------|---------|---------|
-| Language | Java | 17 |
-| Build Tool | Maven | 3.x |
-| API Client | REST Assured | 5.4.0 |
-| Test Framework | TestNG | 7.9.0 |
-| Reporting | Allure | 2.25.0 |
-| Boilerplate Reduction | Lombok | edge |
-| JSON | Jackson | 2.16.1 |
+## 🛠 Technology Stack
+- **Language**: Java 17
+- **HTTP Client**: RestAssured 5.3.x
+- **Testing Framework**: TestNG 7.8.x
+- **Reporting**: Allure Report
+- **Build Tool**: Maven
+- **Architecture**: POJO-based, Builder Pattern, Singleton Configuration
 
-## 📁 Project Structure
+## 📂 Project Structure
 
 ```
-src/
-├── main/java/com/booker/api/
-│   ├── api/                    # API layer (PostApi, UserApi)
-│   ├── config/                 # ConfigManager (singleton)
-│   ├── constants/              # Routes (endpoint constants)
-│   ├── core/                   # RequestSpecFactory
-│   ├── models/                 # POJOs with Lombok (@Data, @Builder)
-│   └── utils/                  # RestUtils, TestDataFactory
-│
-└── test/
-    ├── java/com/booker/api/
-    │   ├── base/               # BaseTest with Allure listener
-    │   └── tests/              # Test classes
-    │       ├── PostCrudTest    # Post CRUD operations
-    │       ├── PostNegativeTest# Post error scenarios
-    │       ├── UserCrudTest    # User CRUD with nested objects
-    │       └── UserNegativeTest# User error scenarios
-    └── resources/
-        ├── config/qa.properties
-        └── allure.properties
+src
+├── main
+│   ├── java.com.booker.api
+│   │   ├── api          # API Layer (Endpoints & Request wrapping)
+│   │   ├── builders     # Builder Pattern for complex objects
+│   │   ├── config       # Configuration Management (Singleton)
+│   │   ├── models       # POJO Models (User, Address, Company, etc.)
+│   │   ├── utils        # Utilities (RestUtils, Routes, TestDataFactory)
+│   └── resources
+│       └── config       # Configuration files (qa.properties)
+└── test
+    ├── java.com.booker.api
+    │   ├── assertions   # Validating constraints (Fluent Assertions)
+    │   ├── base         # Base Test Class (Setup/Teardown)
+    │   └── tests        # Actual Test Classes (UserCrudTest, PostCrudTest)
 ```
 
-## ✨ Key Features
+## ⚙️ Configuration
+The framework uses a **Singleton ConfigManager** to load properties securely.
+- **File**: `src/main/resources/config/qa.properties`
+- **Property**: `base.url=https://jsonplaceholder.typicode.com`
 
-### **Lombok Integration**
+*Note: This file was vital for the framework to run and was added during the recent audit.*
+
+## 🧪 Key Features & Design Patterns
+
+### 1. Builder Pattern
+We use Builders (`UserBuilder`, `AddressBuilder`) to construct complex objects fluently. This avoids "telescoping constructor" anti-patterns and makes test data creation readable.
 ```java
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
-public class Post {
-    private Integer id;
-    private Integer userId;
-    private String title;
-    private String body;
-}
+// Example
+User user = new UserBuilder().name("John").email("john@test.com").build();
 ```
 
-### **Allure Annotations**
+### 2. Random Data Generation
+**`TestDataFactory`** ensures isolation between tests.
+- Every test run generates unique UUID-based strings for Names, Emails, and Titles.
+- **Benefit**: Prevents data collisions and flaky tests.
+
+### 3. API Abstraction Layer
+Tests do not make HTTP calls directly. They delegate to `UserApi` or `PostApi`.
+- **Benefit**: If an endpoint changes (e.g., `/users` becomes `/v1/users`), we only update one file (`Routes.java`), not 50 tests.
+
+### 4. Fluent Assertions
+We implemented custom assertion classes (`ResponseAssert`) to make validation readable:
 ```java
-@Epic("Posts API")
-@Feature("Post CRUD Operations")
-public class PostCrudTest {
-    
-    @Test(priority = 1, groups = {"smoke"})
-    @Severity(SeverityLevel.CRITICAL)
-    @Description("Create a new post")
-    @Story("Create Post")
-    public void testCreatePost() { ... }
-}
+assertThat(response)
+    .statusCodeIs(200)
+    .bodyContains("email", expectedEmail);
 ```
 
-### **TestNG Features**
-- **Priorities**: `@Test(priority = 1)`
-- **Groups**: `@Test(groups = {"smoke", "regression"})`
-- **Dependencies**: `@Test(dependsOnMethods = "testCreatePost")`
-- **Parallel Execution**: Configured in testng.xml
+## 🧠 Test Logic & JSONPlaceholder Quirks
+The mock API (JSONPlaceholder) has specific behaviors that our tests account for:
 
-## 🚀 Quick Start
+- **Non-Persistence**: Resources created via `POST` are **NOT** actually saved on the server. They return a success response but disappear immediately.
+- **Fixed IDs**:
+    - Creation always returns ID `11` (for Users) or `101` (for Posts).
+    - We assert against these specific IDs because the mock server forces them.
+- **Statelessness**:
+    - In `UserCrudTest`, the `testGetUser` method deliberately fetches ID `1` because the ID `11` we "created" in the previous step doesn't really exist.
+    - This ensures our tests pass green even on a stateless mock server.
 
-### Prerequisites
-- Java 17+
-- Maven 3.x
-- IntelliJ IDEA (optional)
+## 🚀 How to Run
+(Assuming Maven is installed)
 
-### Clone & Run
-```bash
-git clone https://github.com/AyushRatan1/booking-api.git
-cd booking-api
-mvn clean test
-```
+1. **Compile**:
+   ```bash
+   mvn clean compile
+   ```
+2. **Run Tests**:
+   ```bash
+   mvn clean test
+   ```
+3. **Generate Report**:
+   ```bash
+   mvn allure:serve
+   ```
 
-### Run by Groups
-```bash
-# Smoke tests only
-mvn test -Dgroups=smoke
-
-# Regression tests
-mvn test -Dgroups=regression
-```
-
-### Generate Allure Report
-```bash
-mvn allure:serve
-```
-
-## 📊 Test Summary
-
-| Test Class | Tests | Groups |
-|------------|-------|--------|
-| PostCrudTest | 6 | smoke, regression |
-| PostNegativeTest | 3 | regression, negative |
-| UserCrudTest | 5 | smoke, regression |
-| UserNegativeTest | 2 | regression, negative |
-| **Total** | **16** | |
-
-## 🌐 API Under Test
-
-[JSONPlaceholder](https://jsonplaceholder.typicode.com) - Free fake REST API
-
-| Endpoint | Description |
-|----------|-------------|
-| `/posts` | Posts CRUD |
-| `/users` | Users with nested Address, Geo, Company |
-| `/comments` | Post comments |
-| `/todos` | Todo items |
-
-## 📝 License
-
-MIT License
+## ✅ Recent Fixes (Audit Log)
+- **Compilation**: Fixed missing imports in `UserCrudTest.java`.
+- **Infrastructure**: Created missing `src/main/resources` directory.
+- **Logic**: Refined `UserCrudTest` to use `dependsOnMethods` for strict execution order (`Create` -> `Get` -> `Update` -> `Delete`).
